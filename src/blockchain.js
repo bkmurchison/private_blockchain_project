@@ -68,11 +68,11 @@ class Blockchain {
             self.getChainHeight()
                 .then((v) => {
                     if (v < 0) {
-                        block.previousBlockHash = "";
+                        block.previousBlockHash = null;
                     } else {
                         block.previousBlockHash = self.chain[v].hash;
                     }
-                    block.hash = "";
+                    block.hash = null;
                     block.time = new Date().getTime().toString().slice(0, -3);
                     block.height = self.height + 1;
                     block.hash = SHA256(JSON.stringify(block)).toString();
@@ -123,7 +123,6 @@ class Blockchain {
      * @param {*} star 
      */
     submitStar(address, message, signature, star) {
-        console.log(`message=${message}, address=${address}, signature=${signature}`)
         let self = this;
         return new Promise(async (resolve, reject) => {
             let time = parseInt(message.split(':')[1]);
@@ -162,7 +161,7 @@ class Blockchain {
     getBlockByHeight(height) {
         let self = this;
         return new Promise((resolve, reject) => {
-            let block = self.chain.filter(p => p.height === height)[0];
+            let block = self.chain.find(p => p.height === height);
             resolve(block);
         });
     }
@@ -201,14 +200,11 @@ class Blockchain {
         let self = this;
         let errorLog = [];
         return new Promise(async (resolve, reject) => {
-            let pBlockHash = '';
+            let pBlockHash = null;
             self.chain.forEach(
                 curr => {
-                    console.log(`curr.height = '${curr.height}', curr.hash='${curr.hash}', curr.previousBlockHash !== pBlockHash? ${curr.previousBlockHash !== pBlockHash}`)
-                    if (curr.height > 0) {
-                        if (curr.previousBlockHash !== pBlockHash) {
-                            errorLog.push(`Block '${curr.height}': Previous Block Hash Does Not Match Actual Block Hash`);
-                        }
+                    if (curr.previousBlockHash !== pBlockHash) {
+                        errorLog.push(`Block '${curr.height}': Previous Block Hash Does Not Match Actual Block Hash`);
                     }
 
                     curr.validate()
@@ -220,7 +216,6 @@ class Blockchain {
                     pBlockHash = curr.hash;
                 }
             )
-            console.log(`completed chain validation. errorLog.length? ${errorLog.length}`)
             resolve(errorLog);
         });
     }

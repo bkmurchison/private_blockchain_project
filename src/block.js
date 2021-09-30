@@ -41,18 +41,10 @@ class Block {
             // Save in auxiliary variable the current block hash
             let currBlockHash = self.hash;
 
-            // make a copy of myself and assign hash to ""
-            let aCpy = {}
-            Object.assign(aCpy, self, { hash: "" });
-
+            // assign hash to null
             // Recalculate the hash of the Block
-            let calcBlockHash = SHA256(JSON.stringify(aCpy)).toString();
-            
+            let calcBlockHash = SHA256(JSON.stringify({ ...self, "hash": null })).toString();
             // Comparing if the hashes changed
-            // Returning the Block is not valid
-            console.log(`================================`)
-            console.log(`currBlockHash = ${currBlockHash}`)
-            console.log(`calcBlockHash = ${calcBlockHash}`)
             let isValid = (calcBlockHash === currBlockHash);
 
             // Returning the Block is valid
